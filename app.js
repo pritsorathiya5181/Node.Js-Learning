@@ -1,13 +1,29 @@
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
-const adminData = require('./routes/admin');
-const shopRoutes = require('./routes/shop');
+const expressHbs = require('express-handlebars');
 
 const app = express();
 
-app.set('view engine', 'pug'); // 'view engine' use for chnage default engine extension here change default to pug.
-app.set('views', 'views'); // here you need to specify path of your views, for that 'views' required.
+/* this for pug engine*/
+///app.set('view engine', 'pug'); // 'view engine' use for chnage default engine extension here change default to pug.
+///app.set('views', 'views'); // here you need to specify path of your views, for that 'views' required.
+
+/* this for express handlerbars engine */
+app.engine('hbs', expressHbs());
+app.engine(
+    'hbs',
+    expressHbs({
+        extname: "hbs",
+        defaultLayout: "",
+        layoutsDir: "",
+    })
+);
+app.set('view engine', 'hbs');
+app.set('views', 'views');
+
+const adminData = require('./routes/admin');
+const shopRoutes = require('./routes/shop');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public'))); // this express.static use for giving access to specific folder or files
