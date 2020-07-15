@@ -1,7 +1,7 @@
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
-const expressHbs = require('express-handlebars');
+// const expressHbs = require('express-handlebars');
 
 const app = express();
 
@@ -10,17 +10,21 @@ const app = express();
 ///app.set('views', 'views'); // here you need to specify path of your views, for that 'views' required.
 
 /* this for express handlerbars engine */
-app.engine('hbs', expressHbs());
-app.engine(
-    'hbs',
-    expressHbs({
-        extname: "hbs",
-        defaultLayout: "main-layout",
-        layoutsDir: "views/layouts/",
-    })
-);
-app.set('view engine', 'hbs');
+// app.engine(
+//     'hbs',
+//     expressHbs({
+//         extname: "hbs",
+//         defaultLayout: "main-layout",
+//         layoutsDir: "views/layouts/",
+//     })
+// );
+// app.set('view engine', 'hbs');
+// app.set('views', 'views');
+
+/* this for ejs engine */
+app.set('view engine', 'ejs');
 app.set('views', 'views');
+
 
 const adminData = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
