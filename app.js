@@ -1,49 +1,75 @@
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
-const errorController = require('./controllers/error');
+
 // const expressHbs = require('express-handlebars');
+const mongoose = require('mongoose');
+const session = require('express-session');
+const MongoDBStore = require('connect-mongodb-session')(session);
+const csrf = require('csurf');
+const flash = require('connect-flash');
+
+const errorController = require('./controllers/error');
+const User = require('./models/user');
+
+const MONGO_URI = 'mongodb+srv://prit123:prit123@cluster0.zfu4j.mongodb.net/shop?retryWrites=true&w=majority';
 
 
 const app = express();
+const store = new MongoDBStore({
+    uri: MONGO_URI,
+    collection: 'sessions',
+});
 
-/* this for pug engine*/
-///app.set('view engine', 'pug'); // 'view engine' use for chnage default engine extension here change default to pug.
-///app.set('views', 'views'); // here you need to specify path of your views, for that 'views' required.
+const csrfProtrction = csrf();
 
-/* this for express handlerbars engine */
-// app.engine(
-//     'hbs',
-//     expressHbs({
-//         extname: "hbs",
-//         defaultLayout: "main-layout",
-//         layoutsDir: "views/layouts/",
-//     })
-// );
-// app.set('view engine', 'hbs');
-// app.set('views', 'views');
-
-/* this for ejs engine */
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
+const authRoutes = require('./routes/auth');
+
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public'))); // this express.static use for giving access to specific folder or files
+app.use(session({
+    secret: 'my secret', resave: false,
+    saveUninitialized: false,
+    store: store
+}));
 
+app.use(csrfProtrction);
+app.use(flash());
+
+app.use((req, res, next) => {
+    if (!req.session.user) {
+        return next();
+    }
+    User.findById(req.session.user._id)
+        .then(user => {
+            req.user = user;
+            next();
+        })
+        .catch(err => console.log(err));
+});
+
+app.use((req, res, next) => {
+    res.locals.isAuthenticated = req.session.isLoggedIn;
+    res.locals.csrfToken = req.csrfToken();
+    next();
+});
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
+app.use(authRoutes);
 
-app.use('/', errorController.get404 );
-//          ^
-// res.status(404).send('<h1>Page not found</h1>');
-// res.status(404).sendFile(path.join(__dirname, 'views', '404.html'));
+app.use('/', errorController.get404);
 
-
-// const server = http.createServer(app);
-// server.listen(3000);
-app.listen(3000);
+mongoose.connect(MONGO_URI)
+    .then(result => {
+        console.log('connected');
+        app.listen(3000);
+    })
+    .catch(err => console.log(err))

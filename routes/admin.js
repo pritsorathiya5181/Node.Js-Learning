@@ -1,24 +1,58 @@
 const path = require('path');
+const { body } = require('express-validator/check');
+
 const express = require('express');
 
-// const rootDir = require('../util/path');
 const adminController = require('../controllers/admin');
+
+const isAuth = require('../middleware/is-auth');
 
 const router = express.Router();
 
-router.get('/add-product', adminController.getAddProduct);
-//                        ^                      
-// res.send('<form action="/admin/product" method="POST"><input type="text" name="title"><button type="submit">Add Product</button></form>');
-// res.sendFile(path.join(rootDir, 'views', 'add-product.html'));
+// /admin/add-product => GET
+router.get('/add-product', isAuth, adminController.getAddProduct);
 
-router.get('/products', adminController.getProducts);
+// /admin/products => GET
+router.get('/products', isAuth, adminController.getProducts);
 
-router.post('/add-product', adminController.postAddProduct);
+// /admin/add-product => POST
+router.post(
+    '/add-product',
+    [
+        body('title')
+            .isString()
+            .isLength({ min: 3 })
+            .trim(),
+        body('imageUrl').isURL(),
+        body('price').isFloat(),
+        body('description')
+            .isLength({ min: 5, max: 400 })
+            .trim()
+    ],
+    isAuth,
+    adminController.postAddProduct
+);
 
-router.get('/edit-product/:productId', adminController.getEditProduct);
 
-router.post('/edit-product', adminController.postEditProduct);
+router.get('/edit-product/:productId', isAuth, adminController.getEditProduct);
 
-router.post('/delete-product', adminController.postDeleteProduct);
+router.post(
+  '/edit-product',
+  [
+    body('title')
+      .isString()
+      .isLength({ min: 3 })
+      .trim(),
+    body('imageUrl').isURL(),
+    body('price').isFloat(),
+    body('description')
+      .isLength({ min: 5, max: 400 })
+      .trim()
+  ],
+  isAuth,
+  adminController.postEditProduct
+);
+
+router.post('/delete-product', isAuth, adminController.postDeleteProduct);
 
 module.exports = router;
