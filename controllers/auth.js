@@ -180,12 +180,13 @@ exports.getReset = (req, res, next) => {
 }
 
 exports.postReset = (req, res, next) => {
+    let token;
     crypto.randomBytes(32, (err, buffer) => {
         if (err) {
             console.log(err);
             return res.redirect('/reset');
         }
-        const token = buffer.toString('hex');
+        token = buffer.toString('hex');
     })
     const email = req.body.email;
     User.findOne({ email: email })
