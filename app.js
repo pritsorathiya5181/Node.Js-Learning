@@ -11,6 +11,8 @@ const csrf = require('csurf');
 const flash = require('connect-flash');
 
 const errorController = require('./controllers/error');
+const shopController = require('./controllers/shop');
+const isAuth = require('./middleware/is-auth');
 const User = require('./models/user');
 
 const MONGO_URI = 'mongodb+srv://prit123:prit123@cluster0.zfu4j.mongodb.net/shop?retryWrites=true&w=majority';
@@ -67,12 +69,12 @@ app.use(session({
     store: store
 }));
 
-app.use(csrfProtrction);
+
+
 app.use(flash());
 
 app.use((req, res, next) => {
     res.locals.isAuthenticated = req.session.isLoggedIn;
-    res.locals.csrfToken = req.csrfToken();
     next();
 });
 
@@ -92,6 +94,14 @@ app.use((req, res, next) => {
             // console.log(err)
             next(new Error(err))
         });
+});
+
+app.post('/create-order', isAuth, shopController.postOrder);
+
+app.use(csrfProtrction);
+app.use((req, res, next) => {
+    res.locals.csrfToken = req.csrfToken();
+    next();
 });
 
 app.use('/admin', adminRoutes);
