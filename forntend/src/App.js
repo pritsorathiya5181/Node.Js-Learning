@@ -1,17 +1,18 @@
-import React, { Component, Fragment } from 'react';
-import { Route, Switch, Redirect, withRouter } from 'react-router-dom';
+import './App.css';
 
-import Layout from './components/Layout/Layout';
+import React, { Component, Fragment } from 'react';
+import { Redirect, Route, Switch, withRouter } from 'react-router-dom';
+
 import Backdrop from './components/Backdrop/Backdrop';
-import Toolbar from './components/Toolbar/Toolbar';
-import MainNavigation from './components/Navigation/MainNavigation/MainNavigation';
-import MobileNavigation from './components/Navigation/MobileNavigation/MobileNavigation';
 import ErrorHandler from './components/ErrorHandler/ErrorHandler';
 import FeedPage from './pages/Feed/Feed';
-import SinglePostPage from './pages/Feed/SinglePost/SinglePost';
+import Layout from './components/Layout/Layout';
 import LoginPage from './pages/Auth/Login';
+import MainNavigation from './components/Navigation/MainNavigation/MainNavigation';
+import MobileNavigation from './components/Navigation/MobileNavigation/MobileNavigation';
 import SignupPage from './pages/Auth/Signup';
-import './App.css';
+import SinglePostPage from './pages/Feed/SinglePost/SinglePost';
+import Toolbar from './components/Toolbar/Toolbar';
 
 class App extends Component {
   state = {
